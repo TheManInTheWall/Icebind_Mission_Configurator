@@ -148,17 +148,6 @@ export default function App() {
     );
   }
   function saveMission(mission: Mission): string | null {
-    if (
-      state.missions.some(
-        (item) =>
-          item.id !== mission.id &&
-          item.playerId === mission.playerId &&
-          item.type === mission.type &&
-          item.setting1 === mission.setting1 &&
-          item.setting2 === mission.setting2,
-      )
-    )
-      return "This player already has that mission and settings combination.";
     const exists = state.missions.some((item) => item.id === mission.id);
     setState((current) => ({
       ...current,
