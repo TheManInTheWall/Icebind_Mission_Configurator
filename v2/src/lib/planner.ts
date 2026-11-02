@@ -421,14 +421,60 @@ export function savedTieChoices(state: PlannerState): Record<string, string> {
   );
 }
 
+export function createEmptyState(): PlannerState {
+  return {
+    players: [],
+    missions: [],
+    selectedIds: [],
+    priorityId: "",
+    includeSettings: false,
+    scores: structuredClone(DEFAULT_SCORES),
+    lastSynced: null,
+    isDemo: false,
+    savedRun: null,
+  };
+}
+
 export function loadState(): PlannerState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return validateState(JSON.parse(raw));
+    if (raw) {
+      const parsed = JSON.parse(raw) as PlannerState;
+
+      // Remove only the six seeded demo players from existing browser data.
+      // Any players the user added themselves are retained.
+      if (parsed?.isDemo && Array.isArray(parsed.players)) {
+        const demoIds = new Set(
+          ["player-1", "player-2", "player-3", "player-4", "player-5", "player-6"],
+        );
+        const players = parsed.players.filter(
+          (player) => !demoIds.has(player.id),
+        );
+        const missions = Array.isArray(parsed.missions)
+          ? parsed.missions.filter((mission) => !demoIds.has(mission.playerId))
+          : [];
+        const selectedIds = Array.isArray(parsed.selectedIds)
+          ? parsed.selectedIds.filter((id) => !demoIds.has(id))
+          : [];
+        return validateState({
+          ...parsed,
+          players,
+          missions,
+          selectedIds,
+          priorityId: selectedIds.includes(parsed.priorityId)
+            ? parsed.priorityId
+            : (selectedIds[0] ?? ""),
+          isDemo: false,
+          savedRun: null,
+        });
+      }
+
+      return validateState(parsed);
+    }
   } catch {
     /* A blocked or outdated local store should not prevent use. */
   }
-  return createDemoState();
+  return createEmptyState();
 }
 
 export function runText(run: RankedRun, includeSettings: boolean): string {
