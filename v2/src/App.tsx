@@ -186,11 +186,6 @@ export default function App() {
     setState((current) => ({
       ...current,
       players: [...current.players, player],
-      selectedIds:
-        current.selectedIds.length < 6
-          ? [...current.selectedIds, player.id]
-          : current.selectedIds,
-      priorityId: current.priorityId || player.id,
       savedRun: null,
     }));
     return null;
