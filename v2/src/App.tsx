@@ -14,7 +14,6 @@ import {
   Trash2,
   Users,
 } from "lucide-react";
-const orbitalScene = `${import.meta.env.BASE_URL}images/orbital-scene.jpg`;
 import {
   DEFAULT_SCORES,
   SHEET_CSV_URL,
@@ -36,6 +35,8 @@ import { MissionBoard } from "./components/MissionBoard";
 import type { BoardTab } from "./components/MissionBoard";
 import { SquadPanel } from "./components/SquadPanel";
 import { Notification } from "./components/Notification";
+
+const orbitalScene = `${import.meta.env.BASE_URL}images/orbital-scene.jpg`;
 
 type ModalState =
   | { type: "mission"; mission?: Mission; defaultType?: string }
