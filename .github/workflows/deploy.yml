@@ -1,9 +1,9 @@
-
+```yaml
 name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -12,7 +12,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: "pages"
   cancel-in-progress: true
 
 jobs:
@@ -20,25 +20,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build application
-        run: npm run build
-
-      - name: Configure GitHub Pages
+      - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload build
+      # Build v1 (repository root)
+      - name: Install v1 dependencies
+        run: npm ci
+
+      - name: Build v1
+        run: npm run build
+
+      # Build v2 (separate project in /v2)
+      - name: Install v2 dependencies
+        run: npm ci --prefix v2
+
+      - name: Build v2
+        run: npm run build --prefix v2
+
+      # Copy v2 into the v1 deployment output
+      - name: Combine builds
+        run: |
+          mkdir -p dist/v2
+          cp -a v2/dist/. dist/v2/
+
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
@@ -55,3 +69,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+```
